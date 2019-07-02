@@ -1,7 +1,9 @@
 import React from 'react';
 import './App.css';
-import Dropdown from "./Dropdown"
+import Dropdown from './Dropdown'
 import { parseString } from 'xml2js';
+import BookDetail from './BookDetail';
+import {BrowserRouter, Route} from 'react-router-dom';
 
 class App extends React.Component {
   constructor() {
@@ -56,29 +58,35 @@ class App extends React.Component {
   render() {
 
     return (
+      <BrowserRouter>
       <div>
         <p className="heading">Book Finder</p>
-        <div className="flexbox flex-column">
-          <form onSubmit={this.handleSubmit}>
-            <input
-              type="text"
-              name="bookName"
-              value={this.state.bookName}
-              className="form-control book-name"
-              placeholder="Book name"
-              onChange={this.handleChange}
-              autoComplete="off"
-            />
-            <button className="btn">Search</button>
-          </form>
-           {(Object.entries(this.state.dataSource).length !== 0 ) && <Dropdown dataSource = {this.state.dataSource}/>}
-          <div className="flexbox">
-            <ul className="list result-count" >
-              {this.state.resultCount !== 0  && <li>Total Results: {this.state.resultCount}</li>}
-            </ul>
+        <Route exact={true} path='/' render={() => (
+            <div className="flexbox flex-column">
+            <form onSubmit={this.handleSubmit}>
+              <input
+                type="text"
+                name="bookName"
+                value={this.state.bookName}
+                className="form-control book-name"
+                placeholder="Book name"
+                onChange={this.handleChange}
+                autoComplete="off"
+              />
+              <button className="btn">Search</button>
+            </form>
+             {(Object.entries(this.state.dataSource).length !== 0 ) && <Dropdown dataSource = {this.state.dataSource}/>}
+            <div className="flexbox">
+              <ul className="list result-count" >
+                {this.state.resultCount !== 0  && <li>Total Results: {this.state.resultCount}</li>}
+              </ul>
+            </div>
           </div>
-        </div>
+         )}/>
+        <Route path='/book-detail' component={BookDetail} />
+        {/* render={(props) => <Dashboard {...props} isAuthed={true} />} */}
       </div>
+      </BrowserRouter>
     );
   }
 }

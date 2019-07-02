@@ -1,6 +1,7 @@
 import React from "react";
 import "./App.css";
 import arrow from './arrow.png';
+import {Link} from 'react-router-dom';
 
 class Dropdown extends React.Component {
   constructor(props) {
@@ -37,9 +38,19 @@ class Dropdown extends React.Component {
 
   componentDidMount() {
     {
-      const titlesResults = this.state.dataSource["GoodreadsResponse"]["search"][0]["results"][0]['work'];
+      const titlesResults = this.state.dataSource["GoodreadsResponse"][
+        "search"
+      ][0]["results"][0]["work"];
+
       const titles = [...titlesResults]
-        .map(item =>  item["best_book"][0]["title"][0])
+        .map(item => {
+          return {
+            title: item["best_book"][0]["title"][0],
+            author: item["best_book"][0]["author"][0]["name"][0],
+            image: item["best_book"][0]["image_url"][0],
+            rating: item["average_rating"][0]
+          };
+        })
         .reduce((resultArray, item, index) => {
           const chunkIndex = Math.floor(index / this.state.itemsPerPage);
           if (!resultArray[chunkIndex]) {
@@ -48,47 +59,52 @@ class Dropdown extends React.Component {
           resultArray[chunkIndex].push(item);
           return resultArray;
         }, []);
+        
       this.setState({
         chunkedList: titles,
         totalItems: titlesResults.length,
         totalPages: Math.ceil(titlesResults.length / this.state.itemsPerPage)
       });
-      // console.log(titlesResults)
-      // console.log(titlesResults.length);
-      // console.log(this.state.totalItems);
-      // console.log(this.state.totalPages);
     }
   }
 
   render() {
-  
     return (
       <div className="dropdown">
         {this.state.pageIndex !== 0 && (
-            <img
-              className="arrow position-left"
-              src={arrow}
-              alt='arrow'
-              onClick={this.previousPage}
-            />
+          <img
+            className="arrow position-left"
+            src={arrow}
+            alt="arrow"
+            onClick={this.previousPage}
+          />
         )}
-  
+
         <ul className="list">
-          {this.state.chunkedList.length !==0 &&
-            this.state.chunkedList[this.state.pageIndex].map((item,i) => (
-            <li key={i}>
-              <a>{item}</a>
-            </li>
-          ))}
+          {this.state.chunkedList.length !== 0 &&
+            this.state.chunkedList[this.state.pageIndex].map((item, i) => (
+              <li key={i}>
+                <Link
+                  to={{
+                    pathname: "/book-detail",
+                    state: {
+                      book: item
+                    }
+                  }}
+                >
+                  {item['title']}
+                </Link>
+              </li>
+            ))}
         </ul>
 
-        {(this.state.pageIndex !== this.state.totalPages) && (
-            <img
-              className="arrow reverse position-right"
-              onClick={this.nextPage}
-              src={arrow}
-              alt='arrow'
-            />
+        {this.state.pageIndex !== this.state.totalPages && (
+          <img
+            className="arrow reverse position-right"
+            onClick={this.nextPage}
+            src={arrow}
+            alt="arrow"
+          />
         )}
       </div>
     );
